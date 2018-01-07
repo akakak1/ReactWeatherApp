@@ -24951,28 +24951,31 @@
 	    },
 
 	    //   FOR CURRENT CITY TEMPERATURE AUTO-REFRESH
-	    lastLocation: '',
+	    location: '',
 	    count: 0,
 
-	    refresh: function refresh() {
+	    refresh: function refresh(location) {
+	        this.location = location;
 
-	        this.handleSearch(this.lastLocation);
+	        var myVar = setInterval(this.handleSearch, 10000);
+
+	        console.log(this.count++);
+
+	        if (this.count > 10) {
+	            clearInterval(myVar);
+	        }
 	    },
 
-	    handleSearch: function handleSearch(location) {
-
-	        this.lastLocation = location;
+	    handleSearch: function handleSearch() {
 
 	        var that = this;
 
 	        this.setState({ isLoading: true });
 
-	        openWeatherMap.getTemp(location).then(function (temp) {
+	        openWeatherMap.getTemp(this.location).then(function (temp) {
 
-	            //This function will execute if there is no error 
-	            // this will not execute even if there is a throw in 1st function in openWeatherMap.getTemp()
 	            that.setState({
-	                location: location,
+	                location: that.location,
 	                temp: temp,
 	                isLoading: false,
 	                notFound: false // this is optional // not this state doenst need to be changed because the JSX corresponding to this doesnt have any props 
@@ -24993,16 +24996,6 @@
 	                notFound: true // there can be different types of error ... I am only checking for City not found ...
 	            });
 	        });
-
-	        //   FOR CURRENT CITY TEMPERATURE AUTO-REFRESH.
-
-	        var myVar = setInterval(this.refresh, 10000); // I think this is being called multiple times... better pass refresh() as prop to WeatherForm(and put setInterval in it) and Call it once
-
-	        console.log(this.count++);
-
-	        if (this.count > 10) {
-	            clearInterval(myVar);
-	        }
 	    },
 
 	    render: function render() {
@@ -25039,7 +25032,7 @@
 	                null,
 	                'Weather Component'
 	            ),
-	            React.createElement(WeatherForm, { onSearch: this.handleSearch }),
+	            React.createElement(WeatherForm, { onSearch: this.refresh }),
 	            renderMessage()
 	        );
 	    }

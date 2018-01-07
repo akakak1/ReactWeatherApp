@@ -15,29 +15,32 @@ var Weather = React.createClass({
 
 
     //   FOR CURRENT CITY TEMPERATURE AUTO-REFRESH
-    lastLocation:'',
+    location:'',
     count:0,
 
-    refresh:function(){
+    refresh:function(location){
+        this.location= location;
 
-        this.handleSearch(this.lastLocation);
+        var  myVar = setInterval(this.handleSearch, 10000);
 
+        console.log(this.count++);
+        
+        if (this.count>10){
+            clearInterval(myVar);
+        }
+        
     },
 
-    handleSearch:function(location){
-
-        this.lastLocation = location;
+    handleSearch:function(){
 
         var that = this;
         
         this.setState({isLoading: true});
         
-        openWeatherMap.getTemp(location).then(function(temp){
+        openWeatherMap.getTemp(this.location).then(function(temp){
 
-            //This function will execute if there is no error 
-            // this will not execute even if there is a throw in 1st function in openWeatherMap.getTemp()
             that.setState({
-                location:location,
+                location:that.location,
                 temp:temp,
                 isLoading:false,
                 notFound:false // this is optional // not this state doenst need to be changed because the JSX corresponding to this doesnt have any props 
@@ -59,21 +62,9 @@ var Weather = React.createClass({
             });
         })
 
-        //   FOR CURRENT CITY TEMPERATURE AUTO-REFRESH.
-    
-        var  myVar = setInterval(this.refresh, 10000);     // I think this is being called multiple times... better pass refresh() as prop to WeatherForm(and put setInterval in it) and Call it once
-        
-        console.log(this.count++);
-        
-        if (this.count>10){
-            clearInterval(myVar);
-        }
-        
     },
 
     render:function(){
-
-  
 
         var {temp, isLoading, location, notFound} = this.state;
 
@@ -91,7 +82,7 @@ var Weather = React.createClass({
         return(
             <div>
                 <h3>Weather Component</h3>
-                <WeatherForm onSearch={this.handleSearch} />
+                <WeatherForm onSearch={this.refresh} />
                 {renderMessage()}
             </div>
         );
