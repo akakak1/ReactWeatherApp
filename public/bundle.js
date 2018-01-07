@@ -24953,17 +24953,12 @@
 	    //   FOR CURRENT CITY TEMPERATURE AUTO-REFRESH
 	    location: '',
 	    count: 0,
+	    intervalVar: '',
 
 	    refresh: function refresh(location) {
 	        this.location = location;
 
-	        var myVar = setInterval(this.handleSearch, 10000);
-
-	        console.log(this.count++);
-
-	        if (this.count > 10) {
-	            clearInterval(myVar);
-	        }
+	        this.intervalVar = setInterval(this.handleSearch, 10000);
 	    },
 
 	    handleSearch: function handleSearch() {
@@ -24996,6 +24991,12 @@
 	                notFound: true // there can be different types of error ... I am only checking for City not found ...
 	            });
 	        });
+
+	        console.log(this.count++);
+
+	        if (this.count > 10) {
+	            clearInterval(this.intervalVar);
+	        }
 	    },
 
 	    render: function render() {
